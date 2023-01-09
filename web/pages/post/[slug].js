@@ -1,37 +1,44 @@
-import groq from 'groq'
-import imageUrlBuilder from '@sanity/image-url'
-import {PortableText} from '@portabletext/react'
-import client from '../../client'
+import groq from "groq";
+import imageUrlBuilder from "@sanity/image-url";
+import { PortableText } from "@portabletext/react";
+import client from "../../client";
 
-function urlFor (source) {
-  return imageUrlBuilder(client).image(source)
+function urlFor(source) {
+  return imageUrlBuilder(client).image(source);
 }
 
 const ptComponents = {
   types: {
     image: ({ value }) => {
       if (!value?.asset?._ref) {
-        return null
+        return null;
       }
       return (
         <img
-          alt={value.alt || ' '}
+          alt={value.alt || " "}
           loading="lazy"
-          src={urlFor(value).width(320).height(240).fit('max').auto('format')}
+          src={urlFor(value)
+            .width(320)
+            .height(240)
+            .fit("max")
+            .auto("format")}
         />
-      )
+      );
     }
   }
-}
+};
 
-const Post = ({post}) => {
+const Post = ({ post }) => {
+  if (!post) return null; // this is the one-liner check
+
   const {
-    title = 'Missing title',
-    name = 'Missing name',
+    title = "Missing title",
+    name = "Missing name",
     categories,
     authorImage,
     body = []
-  } = post
+  } = post;
+
   return (
     <article>
       <h1>{title}</h1>
@@ -39,7 +46,9 @@ const Post = ({post}) => {
       {categories && (
         <ul>
           Posted in
-          {categories.map(category => <li key={category}>{category}</li>)}
+          {categories.map(category => (
+            <li key={category}>{category}</li>
+          ))}
         </ul>
       )}
       {authorImage && (
@@ -52,13 +61,10 @@ const Post = ({post}) => {
           />
         </div>
       )}
-      <PortableText
-        value={body}
-        components={ptComponents}
-      />
+      <PortableText value={body} components={ptComponents} />
     </article>
-  )
-}
+  );
+};
 
 const query = groq`*[_type == "post" && slug.current == $slug][0]{
   title,
@@ -66,26 +72,26 @@ const query = groq`*[_type == "post" && slug.current == $slug][0]{
   "categories": categories[]->title,
   "authorImage": author->image,
   body
-}`
+}`;
 export async function getStaticPaths() {
   const paths = await client.fetch(
     groq`*[_type == "post" && defined(slug.current)][].slug.current`
-  )
+  );
 
   return {
-    paths: paths.map((slug) => ({params: {slug}})),
-    fallback: true,
-  }
+    paths: paths.map(slug => ({ params: { slug } })),
+    fallback: true
+  };
 }
 
 export async function getStaticProps(context) {
   // It's important to default the slug so that it doesn't return "undefined"
-  const { slug = "" } = context.params
-  const post = await client.fetch(query, { slug })
+  const { slug = "" } = context.params;
+  const post = await client.fetch(query, { slug });
   return {
     props: {
       post
     }
-  }
+  };
 }
-export default Post
+export default Post;
