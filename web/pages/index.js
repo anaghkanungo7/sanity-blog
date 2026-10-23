@@ -5,7 +5,7 @@ import client from "../client";
 const Index = ({ posts }) => {
   return (
     <div>
-      <h1>Anagh&apos;s blog</h1>
+      <h1 className="text-3xl font-bold underline">Anagh&apos;s blog</h1>
 
       <div>
         <a href="https://anagh-blog.sanity.studio">Login</a>
@@ -21,7 +21,7 @@ const Index = ({ posts }) => {
             slug && (
               <li key={_id}>
                 <Link href="/post/[slug]" as={`/post/${slug.current}`}>
-                  <a>{title}</a>
+                  {title}
                 </Link>{" "}
                 ({new Date(publishedAt).toDateString()})
               </li>
