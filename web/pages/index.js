@@ -23,7 +23,9 @@ const Index = ({ posts }) => {
                 <Link href="/post/[slug]" as={`/post/${slug.current}`}>
                   {title}
                 </Link>{" "}
-                ({new Date(publishedAt).toDateString()})
+                ({new Date(publishedAt).toLocaleDateString("en-US", {
+                  timeZone: "UTC", weekday: "short", month: "short", day: "2-digit", year: "numeric"
+                })})
               </li>
             )
         )}
